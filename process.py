@@ -457,3 +457,8 @@ def main():
     bias_field_correction(ima, ima_mask)
     writing_script(ima)
     alignment()
+    
+    
+    
+if __name__ == '__main__':
+    main()
