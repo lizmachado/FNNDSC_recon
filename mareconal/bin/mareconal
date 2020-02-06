@@ -1,0 +1,187 @@
+#!/usr/bin/env python3
+#
+# (c) 2020 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+import sys, os
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), '../mareconal'))
+
+from    argparse            import RawTextHelpFormatter
+from    argparse            import ArgumentParser
+
+import  pudb
+
+import  mareconal
+from    pfmisc._colors      import Colors
+
+str_name    = "marconal"
+str_version = "1.0.0.0"
+
+
+str_desc = Colors.CYAN + """
+
+  
+
+
+                            Path-File-DICOM
+
+           A service for DICOM handling -- part of the pf* family.
+
+                              -- version """ + \
+             Colors.YELLOW + str_version + Colors.CYAN + """ --
+
+    'pfdcm' is a module class and stand-alone app that provides a simple API 
+    (both programmatically and CLI-driven) to coordinate data transfers and 
+    management of DICOM data from a remote DICOM server.
+
+    It also provides various DICOM related management services:
+
+        - PACS Q/R
+        - PACS PUSH
+        - Anonymization
+    
+""" + \
+        Colors.BLINK_RED +  """
+        
+              +---------------------------------------------------------+
+              | Use '--enableTokenAuth' and '--tokenPath <tokenPath>'   |
+              |         arguments for secure communication.             |    
+              +---------------------------------------------------------+
+              
+""" + Colors.NO_COLOUR
+
+def synopsis(ab_shortOnly = False):
+    scriptName = os.path.basename(sys.argv[0])
+    shortSynopsis =  '''
+    NAME
+
+	    pfdcm
+
+        - path-and-file DICOM
+
+    SYNOPSIS
+
+            pfdcm                                                   \\
+                [--ipSelf <storageServerIP>]                        \\
+                [--portSelf <storageServerPort>]                    \\
+                [--ipSwift <swiftServerIP>]                         \\
+                [--portSwift <swiftServerPort>]                     \\
+                [--verbosity <level>]                               \\
+                [--configFileLoad <file>]                           \\
+                [--configFileSave <file>]                           \\
+                [--test]                                            \\
+                [--httpResponse]                                    \\
+                [-x|--desc]                                         \\
+                [-y|--synopsis]                                     \\
+                [--version]                                         \\
+                [--debugToDir <dir>]                                \\
+                [--verbosity <level>]                               \\
+                [--type <storageBackendType>]                       \\
+                [--startlistener]                                   \\
+                [--setPACS <PACSJSON>]                              \\
+                --msg '<JSON_formatted_message>'
+
+    BRIEF EXAMPLE
+
+       
+    '''
+
+    description =  '''
+    DESCRIPTION
+
+        ``pfdcm`` is a module/script that provides a ChRIS comms conformant
+        service that acts as a consisitent intermediary for various backend
+        DICOM servers.
+
+        ``pfdcm`` can perform PACS Q/R and for retrieve stores files in various
+        locations -- on the local filesytem or in object storage (such as
+        swift)
+
+        ``pfdcm`` operates in:
+
+            * an http server mode, in which it offers an http REST-like API
+              for using the library/module.
+
+    ARGS
+
+        --msg '<JSON_formatted>'
+        The action to perform.    
+
+
+    ''' 
+    if ab_shortOnly:
+        return shortSynopsis
+    else:
+        return shortSynopsis + description
+
+parser  = ArgumentParser(description = str_desc, formatter_class = RawTextHelpFormatter)
+
+parser.add_argument(
+    '--outputdir',
+    action  = 'store',
+    dest    = 'outputDir',
+    default = '',
+    help    = 'Output directory.'
+)
+
+parser.add_argument(
+    '--inputdir',
+    action  = 'store',
+    dest    = 'inputDir',
+    default = '',
+    help    = 'Input directory.'
+)
+parser.add_argument(
+    '--version',
+    help    = 'if specified, print version number',
+    dest    = 'b_version',
+    action  = 'store_true',
+    default = False
+)
+parser.add_argument(
+    "-v", "--verbosity",
+    help    = "verbosity level for app",
+    dest    = 'verbosity',
+    default = "1")
+parser.add_argument(
+    "-x", "--desc",
+    help    = "long synopsis",
+    dest    = 'desc',
+    action  = 'store_true',
+    default = False
+)
+parser.add_argument(
+    "-y", "--synopsis",
+    help    = "short synopsis",
+    dest    = 'synopsis',
+    action  = 'store_true',
+    default = False
+) 
+
+args            = parser.parse_args()
+
+if args.desc or args.synopsis:
+    print(str_desc)
+    if args.desc:
+        str_help     = synopsis(False)
+    if args.synopsis:
+        str_help     = synopsis(True)
+    print(str_help)
+    sys.exit(1)
+
+if args.b_version:
+    print("Version: %s" % str_version)
+    sys.exit(1)
+
+mareconal	= mareconal.Mareconal(vars(args))
+# mareconal.run()
+
+
+
+
+
+
